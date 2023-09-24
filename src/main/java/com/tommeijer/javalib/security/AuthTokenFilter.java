@@ -14,6 +14,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Map;
 
 @RequiredArgsConstructor
 public class AuthTokenFilter extends OncePerRequestFilter {
@@ -24,8 +25,8 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = getTokenFromRequest(request);
         if (token != null) {
-            Claims claims = (Claims) tokenService.validate(token);
-            UserDetails userDetails = userDetailsService.loadUserByUsername(claims.getSubject());
+            Map<String, Object> claims = tokenService.validate(token);
+            UserDetails userDetails = userDetailsService.loadUserByUsername((String) claims.get(Claims.SUBJECT));
             var auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
