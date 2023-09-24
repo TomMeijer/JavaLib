@@ -1,5 +1,7 @@
 package com.tommeijer.javalib.security;
 
+import com.tommeijer.javalib.error.logging.ErrorLogger;
+import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.impl.DefaultClaims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -32,13 +34,15 @@ class AuthTokenFilterTest {
     @Mock
     private UserDetailsService userService;
     @Mock
+    private ErrorLogger errorLogger;
+    @Mock
     private FilterChain filterChain;
 
     private AuthTokenFilter tokenFilter;
 
     @BeforeEach
     void setUp() {
-        tokenFilter = new AuthTokenFilter(jwtService, userService);
+        tokenFilter = new AuthTokenFilter(jwtService, userService, errorLogger);
         SecurityContextHolder.createEmptyContext();
     }
 
@@ -67,6 +71,20 @@ class AuthTokenFilterTest {
         var auth = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         assertTrue(auth.isAuthenticated());
         assertEquals(principal, auth.getPrincipal());
+        verify(filterChain).doFilter(request, response);
+    }
+
+    @Test
+    void doFilterInternal_invalidToken_noAuth() throws ServletException, IOException {
+        var token = "invalidToken";
+        var request = new MockHttpServletRequest();
+        request.addHeader("Authorization", "Bearer " + token);
+        var exception = new SignatureException("invalid jwt");
+        when(jwtService.validate(token)).thenThrow(exception);
+        var response = new MockHttpServletResponse();
+        tokenFilter.doFilterInternal(request, response, filterChain);
+        verify(errorLogger).log("Failed to set authentication context", exception);
+        assertNull(SecurityContextHolder.getContext().getAuthentication());
         verify(filterChain).doFilter(request, response);
     }
 
