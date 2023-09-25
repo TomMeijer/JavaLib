@@ -29,7 +29,7 @@ public class AuthService {
         return new AuthenticatedDto(accessToken, refreshToken);
     }
 
-    public AccessTokenDto refreshToken(String refreshToken) {
+    public AccessTokenDto refreshAccessToken(String refreshToken) {
         Map<String, Object> claims = refreshTokenService.validate(refreshToken);
         String accessToken = accessTokenService.create((String) claims.get(Claims.SUBJECT));
         return new AccessTokenDto(accessToken);

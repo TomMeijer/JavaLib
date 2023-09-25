@@ -50,13 +50,13 @@ class AuthServiceTest {
     }
 
     @Test
-    void refreshToken_forPrincipal_returnToken() {
+    void refreshAccessToken_forPrincipal_returnToken() {
         var refreshToken = "refreshToken";
         Map<String, Object> claims = Map.of("sub", "user1");
         when(refreshTokenService.validate(refreshToken)).thenReturn(claims);
         var accessToken = "accessToken";
         when(accessTokenService.create((String) claims.get("sub"))).thenReturn(accessToken);
-        var result = authService.refreshToken(refreshToken);
+        var result = authService.refreshAccessToken(refreshToken);
         assertEquals(accessToken, result.getAccessToken());
     }
 }
