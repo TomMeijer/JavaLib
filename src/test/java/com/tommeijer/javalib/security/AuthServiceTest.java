@@ -56,7 +56,10 @@ class AuthServiceTest {
         when(refreshTokenService.validate(refreshToken)).thenReturn(claims);
         var accessToken = "accessToken";
         when(accessTokenService.create((String) claims.get("sub"))).thenReturn(accessToken);
+        var newRefreshToken = "newRefreshToken";
+        when(refreshTokenService.create((String) claims.get("sub"))).thenReturn(newRefreshToken);
         var result = authService.refreshAccessToken(refreshToken);
         assertEquals(accessToken, result.getAccessToken());
+        assertEquals(newRefreshToken, result.getRefreshToken());
     }
 }

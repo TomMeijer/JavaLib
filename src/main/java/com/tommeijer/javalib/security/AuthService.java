@@ -1,6 +1,6 @@
 package com.tommeijer.javalib.security;
 
-import com.tommeijer.javalib.security.model.AccessTokenDto;
+import com.tommeijer.javalib.security.model.RefreshAccessTokenDto;
 import com.tommeijer.javalib.security.model.AuthParams;
 import com.tommeijer.javalib.security.model.AuthenticatedDto;
 import io.jsonwebtoken.Claims;
@@ -29,9 +29,11 @@ public class AuthService {
         return new AuthenticatedDto(accessToken, refreshToken);
     }
 
-    public AccessTokenDto refreshAccessToken(String refreshToken) {
+    public RefreshAccessTokenDto refreshAccessToken(String refreshToken) {
         Map<String, Object> claims = refreshTokenService.validate(refreshToken);
-        String accessToken = accessTokenService.create((String) claims.get(Claims.SUBJECT));
-        return new AccessTokenDto(accessToken);
+        var subject = (String) claims.get(Claims.SUBJECT);
+        String accessToken = accessTokenService.create(subject);
+        String newRefreshToken = refreshTokenService.create(subject);
+        return new RefreshAccessTokenDto(accessToken, newRefreshToken);
     }
 }
