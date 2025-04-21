@@ -1,8 +1,8 @@
 package com.tommeijer.javalib.security;
 
 import com.tommeijer.javalib.error.logging.ErrorLogger;
-import io.jsonwebtoken.SignatureException;
-import io.jsonwebtoken.impl.DefaultClaims;
+import io.jsonwebtoken.impl.DefaultClaimsBuilder;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import org.junit.jupiter.api.AfterEach;
@@ -58,8 +58,7 @@ class AuthTokenFilterTest {
         request.addHeader("Authorization", "Bearer " + token);
 
         var username = "user1";
-        var claims = new DefaultClaims();
-        claims.setSubject(username);
+        var claims = new DefaultClaimsBuilder().subject(username).build();
         when(jwtService.validate(token)).thenReturn(claims);
 
         var principal = new User("username", "pwd", List.of());

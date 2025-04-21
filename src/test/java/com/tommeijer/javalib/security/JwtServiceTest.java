@@ -2,8 +2,8 @@ package com.tommeijer.javalib.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.SignatureException;
+import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +17,7 @@ class JwtServiceTest {
 
     @BeforeEach
     void setUp() {
-        secret = "verySecret";
+        secret = "MFKvOO8qq24/njuH1XEtrIREa1KfW9HAHAtXUmOgP1LH2UQxSpS+EQMHs9wWTF02";
         expirationMillis = 3600_000;
         jwtService = new JwtService(secret, expirationMillis);
     }
@@ -32,9 +32,10 @@ class JwtServiceTest {
 
     private Claims parse(String jwt) {
         return Jwts.parser()
-                .setSigningKey(secret.getBytes())
-                .parseClaimsJws(jwt)
-                .getBody();
+                .verifyWith(Keys.hmacShaKeyFor(secret.getBytes()))
+                .build()
+                .parseSignedClaims(jwt)
+                .getPayload();
     }
 
     @Test
@@ -47,15 +48,15 @@ class JwtServiceTest {
 
     public String create(String username, String secret) {
         return Jwts.builder()
-                .setSubject(username)
-                .signWith(SignatureAlgorithm.HS256, secret.getBytes())
+                .subject(username)
+                .signWith(Keys.hmacShaKeyFor(secret.getBytes()))
                 .compact();
     }
 
     @Test
     void validate_invalidToken_throwException() {
         var username = "user1";
-        var jwt = create(username, "invalidSecret");
+        var jwt = create(username, "kXFZvaXrMCY9N/dWb4N3FqrJK8jlEbkORWqQa2TzGbbPxV2zyp5/V9W3F0jmDHcQ");
         assertThrows(SignatureException.class, () -> jwtService.validate(jwt));
     }
 }

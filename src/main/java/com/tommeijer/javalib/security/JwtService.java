@@ -1,7 +1,7 @@
 package com.tommeijer.javalib.security;
 
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Collections;
@@ -17,11 +17,11 @@ public class JwtService implements TokenService {
 	public String create(String subject, Map<String, Object> claims) {
 		var now = new Date();
 		return Jwts.builder()
-				.setSubject(subject)
-				.setIssuedAt(now)
-				.setExpiration(new Date(now.getTime() + expirationMillis))
-				.addClaims(claims)
-				.signWith(SignatureAlgorithm.HS256, secret.getBytes())
+				.subject(subject)
+				.issuedAt(now)
+				.expiration(new Date(now.getTime() + expirationMillis))
+				.claims(claims)
+				.signWith(Keys.hmacShaKeyFor(secret.getBytes()))
 				.compact();
 	}
 
@@ -33,8 +33,9 @@ public class JwtService implements TokenService {
 	@Override
 	public Map<String, Object> validate(String token) {
 		return Jwts.parser()
-				.setSigningKey(secret.getBytes())
-				.parseClaimsJws(token)
-				.getBody();
+                .verifyWith(Keys.hmacShaKeyFor(secret.getBytes()))
+                .build()
+                .parseSignedClaims(token)
+				.getPayload();
 	}
 }
