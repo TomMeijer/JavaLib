@@ -13,7 +13,7 @@ import org.springframework.http.client.ClientHttpResponse;
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class BearerAuthInterceptorTest {

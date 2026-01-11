@@ -1,8 +1,8 @@
 package com.tommeijer.javalib.security;
 
-import com.tommeijer.javalib.security.model.RefreshAccessTokenDto;
 import com.tommeijer.javalib.security.model.AuthParams;
 import com.tommeijer.javalib.security.model.AuthenticatedDto;
+import com.tommeijer.javalib.security.model.RefreshAccessTokenDto;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;

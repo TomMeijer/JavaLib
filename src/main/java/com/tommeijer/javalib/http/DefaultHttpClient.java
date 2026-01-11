@@ -29,7 +29,7 @@ public class DefaultHttpClient implements HttpClient {
     private String buildUrl(HttpRequest request) {
         var uriBuilder = request.getUrl().startsWith("/")
                 ? UriComponentsBuilder.fromPath(request.getUrl())
-                : UriComponentsBuilder.fromHttpUrl(request.getUrl());
+                : UriComponentsBuilder.fromUriString(request.getUrl());
         if (request.getQueryParams() != null) {
             request.getQueryParams()
                     .entrySet()

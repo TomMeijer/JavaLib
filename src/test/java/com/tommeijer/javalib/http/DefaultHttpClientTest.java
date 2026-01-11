@@ -3,6 +3,7 @@ package com.tommeijer.javalib.http;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpEntity;
@@ -11,15 +12,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
-
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 
 @ExtendWith(MockitoExtension.class)
 class DefaultHttpClientTest {
@@ -44,20 +43,28 @@ class DefaultHttpClientTest {
                 .header("header2", "headerValue2")
                 .build();
         var responseEntity = new ResponseEntity<>("body", HttpStatus.OK);
+        
+        var expectedUrl = request.getUrl() + "?param1=value1&param2=value2";
+        var expectedMethod = HttpMethod.valueOf(request.getMethod().name());
+        
         when(restTemplate.exchange(
-                eq(request.getUrl() + "?param1=value1&param2=value2"),
-                eq(HttpMethod.valueOf(request.getMethod().name())),
-                argThat(allOf(
-                        hasProperty("body", is(nullValue())),
-                        hasProperty("headers", allOf(
-                                hasEntry("header1", List.of("headerValue1")),
-                                hasEntry("header2", List.of("headerValue2"))
-                        ))
-                )),
+                eq(expectedUrl),
+                eq(expectedMethod),
+                any(HttpEntity.class),
                 eq(String.class)
         )).thenReturn(responseEntity);
+        
         var result = httpClient.executeRequest(request, String.class);
+        
         assertThat(result, is(responseEntity.getBody()));
+        
+        var entityCaptor = ArgumentCaptor.forClass(HttpEntity.class);
+        verify(restTemplate).exchange(eq(expectedUrl), eq(expectedMethod), entityCaptor.capture(), eq(String.class));
+        
+        HttpEntity<?> capturedEntity = entityCaptor.getValue();
+        assertThat(capturedEntity.getBody(), is(nullValue()));
+        assertThat(capturedEntity.getHeaders().getFirst("header1"), is("headerValue1"));
+        assertThat(capturedEntity.getHeaders().getFirst("header2"), is("headerValue2"));
     }
 
     @Test
@@ -70,20 +77,28 @@ class DefaultHttpClientTest {
                 .header("header2", "headerValue2")
                 .build();
         var responseEntity = new ResponseEntity<>("body", HttpStatus.OK);
+        
+        var expectedUrl = request.getUrl();
+        var expectedMethod = HttpMethod.valueOf(request.getMethod().name());
+        
         when(restTemplate.exchange(
-                eq(request.getUrl()),
-                eq(HttpMethod.valueOf(request.getMethod().name())),
-                argThat(allOf(
-                        hasProperty("body", is(request.getBody())),
-                        hasProperty("headers", allOf(
-                                hasEntry("header1", List.of("headerValue1")),
-                                hasEntry("header2", List.of("headerValue2"))
-                        ))
-                )),
+                eq(expectedUrl),
+                eq(expectedMethod),
+                any(HttpEntity.class),
                 eq(String.class)
         )).thenReturn(responseEntity);
+        
         var result = httpClient.executeRequest(request, String.class);
+        
         assertThat(result, is(responseEntity.getBody()));
+        
+        var entityCaptor = ArgumentCaptor.forClass(HttpEntity.class);
+        verify(restTemplate).exchange(eq(expectedUrl), eq(expectedMethod), entityCaptor.capture(), eq(String.class));
+        
+        HttpEntity<?> capturedEntity = entityCaptor.getValue();
+        assertThat(capturedEntity.getBody(), is(request.getBody()));
+        assertThat(capturedEntity.getHeaders().getFirst("header1"), is("headerValue1"));
+        assertThat(capturedEntity.getHeaders().getFirst("header2"), is("headerValue2"));
     }
 
     @Test
@@ -95,13 +110,25 @@ class DefaultHttpClientTest {
                 .queryParam("param2", "value2")
                 .build();
         var responseEntity = new ResponseEntity<>("body", HttpStatus.OK);
+        
+        var expectedUrl = request.getUrl() + "?param1=value1&param2=value2";
+        var expectedMethod = HttpMethod.valueOf(request.getMethod().name());
+        
         when(restTemplate.exchange(
-                eq(request.getUrl() + "?param1=value1&param2=value2"),
-                eq(HttpMethod.valueOf(request.getMethod().name())),
+                eq(expectedUrl),
+                eq(expectedMethod),
                 any(HttpEntity.class),
                 eq(String.class)
         )).thenReturn(responseEntity);
+        
         var result = httpClient.executeRequest(request, String.class);
+        
         assertThat(result, is(responseEntity.getBody()));
+        
+        var entityCaptor = ArgumentCaptor.forClass(HttpEntity.class);
+        verify(restTemplate).exchange(eq(expectedUrl), eq(expectedMethod), entityCaptor.capture(), eq(String.class));
+        
+        HttpEntity<?> capturedEntity = entityCaptor.getValue();
+        assertThat(capturedEntity.getBody(), is(nullValue()));
     }
 }
