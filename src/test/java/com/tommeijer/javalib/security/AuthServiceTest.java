@@ -34,7 +34,7 @@ class AuthServiceTest {
     }
 
     @Test
-    void authenticate_user_generateToken() {
+    void authenticate_ValidUser_ShouldGenerateTokens() {
         var params = new AuthParams("email", "password");
         var user = new User("username", "password", List.of());
         var auth = new TestingAuthenticationToken(user, null);
@@ -50,7 +50,7 @@ class AuthServiceTest {
     }
 
     @Test
-    void refreshAccessToken_forPrincipal_returnToken() {
+    void refreshAccessToken_ValidToken_ShouldReturnNewTokens() {
         var refreshToken = "refreshToken";
         Map<String, Object> claims = Map.of("sub", "user1");
         when(refreshTokenService.validate(refreshToken)).thenReturn(claims);

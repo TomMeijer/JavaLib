@@ -34,7 +34,7 @@ class DefaultHttpClientTest {
     }
 
     @Test
-    void executeRequest_getWithQueryParamsAndHeaders_correctRequest() {
+    void executeRequest_GetWithQueryParamsAndHeaders_ShouldCreateCorrectRequest() {
         var request = HttpRequest.builder()
                 .method(HttpRequest.Method.GET)
                 .url("https://myapi.com")
@@ -61,7 +61,7 @@ class DefaultHttpClientTest {
     }
 
     @Test
-    void executeRequest_postWithBodyAndHeaders_correctRequest() {
+    void executeRequest_PostWithBodyAndHeaders_ShouldCreateCorrectRequest() {
         var request = HttpRequest.builder()
                 .method(HttpRequest.Method.POST)
                 .url("https://myapi.com")
@@ -87,7 +87,7 @@ class DefaultHttpClientTest {
     }
 
     @Test
-    void executeRequest_urlAsPath_correctRequest() {
+    void executeRequest_UrlAsPath_ShouldCreateCorrectRequest() {
         var request = HttpRequest.builder()
                 .method(HttpRequest.Method.GET)
                 .url("/path")

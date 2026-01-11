@@ -52,7 +52,7 @@ class AuthTokenFilterTest {
     }
 
     @Test
-    void doFilterInternal_validToken_setAuth() throws ServletException, IOException {
+    void doFilterInternal_ValidToken_ShouldSetAuthentication() throws ServletException, IOException {
         var token = "token";
         var request = new MockHttpServletRequest();
         request.addHeader("Authorization", "Bearer " + token);
@@ -74,7 +74,7 @@ class AuthTokenFilterTest {
     }
 
     @Test
-    void doFilterInternal_invalidToken_noAuth() throws ServletException, IOException {
+    void doFilterInternal_InvalidToken_ShouldNotSetAuthentication() throws ServletException, IOException {
         var token = "invalidToken";
         var request = new MockHttpServletRequest();
         request.addHeader("Authorization", "Bearer " + token);
@@ -88,7 +88,7 @@ class AuthTokenFilterTest {
     }
 
     @Test
-    void doFilterInternal_noToken_noAuth() throws ServletException, IOException {
+    void doFilterInternal_NoToken_ShouldNotSetAuthentication() throws ServletException, IOException {
         var request = new MockHttpServletRequest();
         var response = new MockHttpServletResponse();
         tokenFilter.doFilterInternal(request, response, filterChain);

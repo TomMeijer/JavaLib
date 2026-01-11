@@ -23,7 +23,7 @@ class JwtServiceTest {
     }
 
     @Test
-    void create_forUsername_returnToken() {
+    void create_ForUsername_ShouldReturnToken() {
         var username = "user1";
         var jwt = jwtService.create(username);
         var claims = parse(jwt);
@@ -39,7 +39,7 @@ class JwtServiceTest {
     }
 
     @Test
-    void validate_validToken_returnClaims() {
+    void validate_ValidToken_ShouldReturnClaims() {
         var username = "user1";
         var jwt = create(username, secret);
         var claims = (Claims) jwtService.validate(jwt);
@@ -54,7 +54,7 @@ class JwtServiceTest {
     }
 
     @Test
-    void validate_invalidToken_throwException() {
+    void validate_InvalidToken_ShouldThrowException() {
         var username = "user1";
         var jwt = create(username, "kXFZvaXrMCY9N/dWb4N3FqrJK8jlEbkORWqQa2TzGbbPxV2zyp5/V9W3F0jmDHcQ");
         assertThrows(SignatureException.class, () -> jwtService.validate(jwt));
